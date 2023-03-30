@@ -21,8 +21,28 @@ namespace webApiPractica.Controllers
         [Route("GetAll")]
         public IActionResult Get()
         {
-            List<reservas> listado_reservas = (from e in _equiposContext.reservas
-                                                   select e).ToList();
+            var listado_reservas = (from e in _equiposContext.reservas
+                                        join eq in _equiposContext.equipos
+                                            on e.equipo_id equals eq.id_equipos
+                                        join u in _equiposContext.usuarios
+                                            on e.usuario_id equals u.usuario_id
+                                        join er in _equiposContext.estados_reserva 
+                                            on e.estado_reserva_id equals er.estado_res_id
+                                        select new
+                                        {
+                                            e.reserva_id,
+                                            e.equipo_id,
+                                            equipo = eq.nombre,
+                                            e.usuario_id,
+                                            usuario = u.nombre,
+                                            e.fecha_salida,
+                                            e.hora_salida,
+                                            e.tiempo_reserva,
+                                            e.estado_reserva_id,
+                                            estado_reserva = er.estado,
+                                            e.fecha_retorno,
+                                            e.hora_retorno
+                                         }).ToList();
 
             if (listado_reservas.Count() == 0) { return NotFound(); }
 
@@ -33,10 +53,30 @@ namespace webApiPractica.Controllers
         [HttpGet]
         [Route("GetById/{id}")]
         public IActionResult GetById(int id)
-        {
-            reservas? reservas = (from e in _equiposContext.reservas
-                                      where e.reserva_id == id
-                                      select e).FirstOrDefault();
+        { 
+            var reservas = (from e in _equiposContext.reservas
+                                    where e.reserva_id == id
+                                    join eq in _equiposContext.equipos
+                                        on e.equipo_id equals eq.id_equipos
+                                    join u in _equiposContext.usuarios
+                                        on e.usuario_id equals u.usuario_id
+                                    join er in _equiposContext.estados_reserva
+                                        on e.estado_reserva_id equals er.estado_res_id
+                                    select new
+                                    {
+                                        e.reserva_id,
+                                        e.equipo_id,
+                                        equipo = eq.nombre,
+                                        e.usuario_id,
+                                        usuario = u.nombre,
+                                        e.fecha_salida,
+                                        e.hora_salida,
+                                        e.tiempo_reserva,
+                                        e.estado_reserva_id,
+                                        estado_reserva = er.estado,
+                                        e.fecha_retorno,
+                                        e.hora_retorno
+                                    }).FirstOrDefault(); 
 
             if (reservas == null) { return NotFound(); }
 

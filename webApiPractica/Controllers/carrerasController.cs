@@ -16,13 +16,21 @@ namespace webApiPractica.Controllers
             _equiposContext = equiposContext;
         }
 
-        // EndPoint que devuelve todos los registros
+        // EndPoint que devuelve todos los registros 
         [HttpGet]
         [Route("GetAll")]
         public IActionResult Get()
         {
-            List<carreras> listado_carreras = (from e in _equiposContext.carreras
-                                                             select e).ToList();
+            var listado_carreras = (from e in _equiposContext.carreras
+                                        join f in _equiposContext.facultades
+                                        on e.facultad_id equals f.facultad_id
+                                   select new
+                                   {
+                                       e.carrera_id,
+                                       e.nombre_carrera,
+                                       e.facultad_id,
+                                       f.nombre_facultad
+                                   }).ToList();
 
             if (listado_carreras.Count() == 0) { return NotFound(); }
 
@@ -34,9 +42,19 @@ namespace webApiPractica.Controllers
         [Route("GetById/{id}")]
         public IActionResult GetById(int id)
         {
-            carreras? carreras = (from e in _equiposContext.carreras
-                                 where e.carrera_id == id
-                                 select e).FirstOrDefault();
+            
+
+            var carreras = (from e in _equiposContext.carreras
+                            where e.carrera_id == id
+                            join f in _equiposContext.facultades
+                                    on e.facultad_id equals f.facultad_id
+                                    select new
+                                    {
+                                        e.carrera_id,
+                                        e.nombre_carrera,
+                                        e.facultad_id,
+                                        f.nombre_facultad
+                                    }).FirstOrDefault();
 
             if (carreras == null) { return NotFound(); }
 
