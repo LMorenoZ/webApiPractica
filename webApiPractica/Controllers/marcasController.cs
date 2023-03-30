@@ -43,7 +43,7 @@ namespace webApiPractica.Controllers
             return Ok(marca);
         }
 
-        // EndPoint que permite crear una nueva marca. Usa el petodo POST
+        // EndPoint que permite crear una nueva marca. Usa el método POST
         [HttpPost]
         [Route("Add")]
         public IActionResult GuardarMarca([FromBody] marcas marca)
